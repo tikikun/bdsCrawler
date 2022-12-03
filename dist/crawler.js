@@ -13,12 +13,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _bdsCrawler_instances, _bdsCrawler_getItemArray, _bdsCrawler_handleListPage, _bdsCrawler_makeCrawlArray;
 Object.defineProperty(exports, "__esModule", { value: true });
-const browser_1 = __importDefault(require("./browser"));
+exports.bdsCrawler = void 0;
 class bdsCrawler {
     constructor(pupBrowser, pageUrl, startPage, endPage) {
         _bdsCrawler_instances.add(this);
@@ -41,21 +38,22 @@ class bdsCrawler {
         });
     }
 }
+exports.bdsCrawler = bdsCrawler;
 _bdsCrawler_instances = new WeakSet(), _bdsCrawler_getItemArray = function _bdsCrawler_getItemArray(pageUrl) {
     return __awaiter(this, void 0, void 0, function* () {
         const itemList = yield __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_handleListPage).call(this, pageUrl);
         const resultArray = itemList.map((el) => __awaiter(this, void 0, void 0, function* () {
-            const item = yield el.$eval('a', a => {
+            const item = yield el.$eval('a', (a, pageUrl) => {
                 var _a, _b, _c;
                 const payload = {
                     title: a.getAttribute('title'),
                     price: ((_a = a.querySelector('.re__card-config-price')) === null || _a === void 0 ? void 0 : _a.textContent) || null,
                     area: ((_b = a.querySelector('.re__card-config-area')) === null || _b === void 0 ? void 0 : _b.textContent) || null,
                     publishedAt: ((_c = a.querySelector('.re__card-published-info-published-at')) === null || _c === void 0 ? void 0 : _c.getAttribute('aria-label')) || null,
-                    url: window.location.href
+                    url: pageUrl
                 };
                 return payload;
-            });
+            }, pageUrl);
             return item;
         }));
         const result = Promise.all(resultArray);
@@ -77,7 +75,3 @@ _bdsCrawler_instances = new WeakSet(), _bdsCrawler_getItemArray = function _bdsC
     }
     return result;
 };
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield new bdsCrawler(yield (0, browser_1.default)(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', 1, 10).getMultiPage();
-    console.log(data);
-}))();

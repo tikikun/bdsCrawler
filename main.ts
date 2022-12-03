@@ -1,12 +1,18 @@
 import startBrowser from './browser'
 import { bdsCrawler } from './crawler'
+import { getDataList } from './tasks'
+import express from 'express'
 
 
 
+const app = express()
+const port = 3000
 
-(async () => {
+app.get('/getPage', async (req, res) => {
+    const dataList = await getDataList()
+    res.send(dataList)
+})
 
-    const data = await new bdsCrawler(await startBrowser(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', 1, 10).getMultiPage()
-    console.log(data)
-
-})()
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
