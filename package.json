@@ -4,9 +4,9 @@
   "description": "The first version of npm package that i have tried",
   "main": "helloworld.ts",
   "scripts": {
-    "build": "npx tsc && node dist/hellworld.js",
-    "start": "node dist/hellworld.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/hellworld.js\""
+    "build": "npx tsc && node dist/main.js",
+    "start": "node dist/main.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/main.js\""
   },
   "author": "",
   "license": "ISC",
