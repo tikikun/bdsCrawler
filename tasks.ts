@@ -6,9 +6,8 @@ import { listingItem } from './interfaces'
 
 
 
-async function getDataList(): Promise<listingItem[]> {
-
-    const data = await new bdsCrawler(await startBrowser(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', 1, 10).getMultiPage()
+async function getDataList(startPage: number, endPage: number): Promise<listingItem[]> {
+    const data = await new bdsCrawler(await startBrowser(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', startPage, endPage).getMultiPage()
     return data
 }
 

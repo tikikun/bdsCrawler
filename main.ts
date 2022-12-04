@@ -9,7 +9,7 @@ const app = express()
 const port = 3000
 
 app.get('/getPage', async (req, res) => {
-    const dataList = await getDataList()
+    const dataList = await getDataList( parseInt(req.query.startpage as string), parseInt(req.query.endpage as string))
     res.send(dataList)
 })
 

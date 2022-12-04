@@ -2,7 +2,7 @@ import puppeteer, { Browser } from 'puppeteer';
 
 
 async function startBrowser(): Promise<Browser> {
-    let browser : Browser
+    let browser: Browser
     let config: object = {}
 
     if (process.env.headless === '1') {

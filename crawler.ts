@@ -33,7 +33,7 @@ class bdsCrawler {
     async #getItemArray(pageUrl: string): Promise<listingItem[]> {
         const itemList = await this.#handleListPage(pageUrl)
         const resultArray = itemList.map(async el => {
-            const item = await el.$eval('a', (a,pageUrl) => {
+            const item = await el.$eval('a', (a, pageUrl) => {
 
                 const payload: listingItem = {
                     title: a.getAttribute('title'),
@@ -44,7 +44,7 @@ class bdsCrawler {
                 }
 
                 return payload
-            },pageUrl
+            }, pageUrl
             )
             return item
         })
@@ -73,4 +73,4 @@ class bdsCrawler {
 
 }
 
-export {bdsCrawler}
+export { bdsCrawler }
