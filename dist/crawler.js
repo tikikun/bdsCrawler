@@ -34,6 +34,7 @@ class bdsCrawler {
                 result = result.concat(itemlist);
             })));
             console.log('Done fetching all return data');
+            this.pupBrowser.close();
             return result;
         });
     }

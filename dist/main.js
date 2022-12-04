@@ -16,10 +16,24 @@ const tasks_1 = require("./tasks");
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const port = 3000;
-app.get('/getPage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const dataList = yield (0, tasks_1.getDataList)();
+app.use(logging);
+app.get('/getPage', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const startPage = req.query.startpage;
+    const endPage = req.query.endpage;
+    if (startPage === undefined || endPage === undefined) {
+        return next();
+    }
+    const dataList = yield (0, tasks_1.getDataList)(parseInt(startPage), parseInt(endPage));
     res.send(dataList);
 }));
+app.use(bugRaise);
+function logging(req, res, next) {
+    console.log('Thunghiemn');
+    next();
+}
+function bugRaise(req, res, next) {
+    res.send('The required fields are not specified, please retry with sepcified fields');
+}
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

@@ -15,9 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDataList = void 0;
 const browser_1 = __importDefault(require("./browser"));
 const crawler_1 = require("./crawler");
-function getDataList() {
+function getDataList(startPage, endPage) {
     return __awaiter(this, void 0, void 0, function* () {
-        const data = yield new crawler_1.bdsCrawler(yield (0, browser_1.default)(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', 1, 10).getMultiPage();
+        const data = yield new crawler_1.bdsCrawler(yield (0, browser_1.default)(), 'https://batdongsan.com.vn/ban-can-ho-chung-cu-can-ho-hoang-quoc-viet', startPage, endPage).getMultiPage();
         return data;
     });
 }

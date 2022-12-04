@@ -27,6 +27,7 @@ class bdsCrawler {
             }
         ))
         console.log('Done fetching all return data')
+        this.pupBrowser.close()
         return result
     }
 
