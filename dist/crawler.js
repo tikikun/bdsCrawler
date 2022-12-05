@@ -28,11 +28,17 @@ class bdsCrawler {
         return __awaiter(this, void 0, void 0, function* () {
             var result = [];
             const listPage = __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_makeCrawlArray).call(this);
-            yield Promise.all(listPage.map((page) => __awaiter(this, void 0, void 0, function* () {
-                const itemlist = yield __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_getItemArray).call(this, page);
-                console.log(`Done fetching for page: ${page}`);
-                result = result.concat(itemlist);
-            })));
+            while (listPage.length) {
+                yield Promise.all(listPage.splice(0, 5).map((page) => __awaiter(this, void 0, void 0, function* () {
+                    const itemArrayData = yield __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_getItemArray).call(this, page);
+                    const itemlist = yield itemArrayData.tasksList;
+                    const tab = itemArrayData.page;
+                    console.log(`Done fetching for page: ${page}`);
+                    result = result.concat(itemlist);
+                    console.log(`Close tab for page ${page} now`);
+                    tab.close();
+                })));
+            }
             console.log('Done fetching all return data');
             this.pupBrowser.close();
             return result;
@@ -42,7 +48,9 @@ class bdsCrawler {
 exports.bdsCrawler = bdsCrawler;
 _bdsCrawler_instances = new WeakSet(), _bdsCrawler_getItemArray = function _bdsCrawler_getItemArray(pageUrl) {
     return __awaiter(this, void 0, void 0, function* () {
-        const itemList = yield __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_handleListPage).call(this, pageUrl);
+        const listPageInfo = yield __classPrivateFieldGet(this, _bdsCrawler_instances, "m", _bdsCrawler_handleListPage).call(this, pageUrl);
+        const itemList = listPageInfo.itemList;
+        const page = listPageInfo.page;
         const resultArray = itemList.map((el) => __awaiter(this, void 0, void 0, function* () {
             const item = yield el.$eval('a', (a, pageUrl) => {
                 var _a, _b, _c;
@@ -57,17 +65,19 @@ _bdsCrawler_instances = new WeakSet(), _bdsCrawler_getItemArray = function _bdsC
             }, pageUrl);
             return item;
         }));
-        const result = Promise.all(resultArray);
-        return result;
+        const taskslList = Promise.all(resultArray);
+        return { tasksList: taskslList, page: page };
     });
 }, _bdsCrawler_handleListPage = function _bdsCrawler_handleListPage(pageUrl) {
     return __awaiter(this, void 0, void 0, function* () {
         const page = yield this.pupBrowser.newPage();
+        yield page.setDefaultNavigationTimeout(300000);
         yield page.goto(pageUrl);
         yield page.waitForSelector('span.re__card-config-price_per_m2');
         //await new Promise(r => setTimeout(r, 2000))
         const itemList = yield page.$$('#product-lists-web > div');
-        return itemList;
+        const listPageData = { itemList: itemList, page: page };
+        return listPageData;
     });
 }, _bdsCrawler_makeCrawlArray = function _bdsCrawler_makeCrawlArray() {
     const result = [];

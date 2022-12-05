@@ -17,22 +17,42 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const port = 3000;
 app.use(logging);
-app.get('/getPage', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+app.get('/getPage', checkInputParams, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const startPage = req.query.startpage;
     const endPage = req.query.endpage;
-    if (startPage === undefined || endPage === undefined) {
+    if (startPage === undefined) {
+        // @ts-ignore
+        req.missingVar = 'startpage';
+        return next();
+    }
+    else if (endPage === undefined) {
+        // @ts-ignore
+        req.missingVar = 'endpage';
         return next();
     }
     const dataList = yield (0, tasks_1.getDataList)(parseInt(startPage), parseInt(endPage));
     res.send(dataList);
 }));
 app.use(bugRaise);
+// need to add task name here 
 function logging(req, res, next) {
-    console.log('Thunghiemn');
+    console.log('Start task with task name');
     next();
 }
 function bugRaise(req, res, next) {
-    res.send('The required fields are not specified, please retry with sepcified fields');
+    // @ts-ignore
+    res.send(`There is no ${req.missingVar} defined`);
+}
+function checkInputParams(req, res, next) {
+    if (Object.keys(req.query).length == 0) {
+        lackParams(res);
+    }
+    else {
+        return next();
+    }
+}
+function lackParams(res) {
+    res.send('You do not specify any parameter');
 }
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

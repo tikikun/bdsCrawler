@@ -1,4 +1,4 @@
-import { Browser } from 'puppeteer'
+import { Browser, ElementHandle, Page } from 'puppeteer'
 import startBrowser from './browser'
 import { listingItem } from './interfaces'
 
@@ -18,21 +18,27 @@ class bdsCrawler {
     async getMultiPage() {
         var result: listingItem[] = []
         const listPage = this.#makeCrawlArray()
-
-        await Promise.all(listPage.map(
+        while ( listPage.length){
+        await Promise.all(listPage.splice(0,5).map(
             async (page) => {
-                const itemlist = await this.#getItemArray(page)
+                const itemArrayData = await this.#getItemArray(page)
+                const itemlist = await itemArrayData.tasksList
+                const tab = itemArrayData.page
                 console.log(`Done fetching for page: ${page}`)
                 result = result.concat(itemlist)
+                console.log(`Close tab for page ${page} now`)
+                tab.close()
             }
-        ))
+        ))}
         console.log('Done fetching all return data')
         this.pupBrowser.close()
         return result
     }
 
-    async #getItemArray(pageUrl: string): Promise<listingItem[]> {
-        const itemList = await this.#handleListPage(pageUrl)
+    async #getItemArray(pageUrl: string) {
+        const listPageInfo = await this.#handleListPage(pageUrl)
+        const itemList = listPageInfo.itemList
+        const page = listPageInfo.page
         const resultArray = itemList.map(async el => {
             const item = await el.$eval('a', (a, pageUrl) => {
 
@@ -50,17 +56,20 @@ class bdsCrawler {
             return item
         })
 
-        const result = Promise.all(resultArray)
-        return result
+        const taskslList = Promise.all(resultArray)
+        
+        return {tasksList:taskslList,page:page}
     }
 
     async #handleListPage(pageUrl: string) {
         const page = await this.pupBrowser.newPage()
+        await page.setDefaultNavigationTimeout(300000)
         await page.goto(pageUrl)
         await page.waitForSelector('span.re__card-config-price_per_m2')
         //await new Promise(r => setTimeout(r, 2000))
         const itemList = await page.$$('#product-lists-web > div')
-        return itemList
+        const listPageData:{ itemList: ElementHandle<HTMLDivElement>[], page: Page } = {itemList:itemList,page:page}
+        return listPageData
     }
 
 
